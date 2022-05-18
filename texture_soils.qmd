@@ -118,12 +118,12 @@ TT.plot(
 
 ```{r}
 TT.plot(
-  class.sys = "ISSS.TT",  
+  class.sys = "HYPRES.TT",  
   css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"),
   tri.data = texture,
   class.p.bg.col = TRUE,
   z.name = "PH",
-  main = "Triángulo Textural de Suelo - ISSS"
+  main = "Triángulo Textural de Suelo - HYPRES"
 )
 ```
 
