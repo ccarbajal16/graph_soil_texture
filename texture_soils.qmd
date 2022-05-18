@@ -33,7 +33,7 @@ sand <- c(sample(0:60, 50, replace = T))
 silt <- c(sample(0:40, 50, replace = T))
 clay <- c(100-(sand+silt))
 # Generación de números aleatorios referentes a valores de pH
-ph <-  c(runif(50, 4,8)) 
+ph <-  c(runif(50, min=4,max=8)) 
 
 
 # Generación de nuestra tabla de datos en formato dataframe.
