@@ -8,7 +8,17 @@ bibliography: references.bib
 
 ## Textura de los suelos
 
-Como sabemos la textura representa una de las propiedades físicas más importantes de los suelos, en esta oportunidad vamos a emplear los paquetes de **plotrix** [@plotrix] y **soiltexture** [@soiltexture] para graficar valores en porcentajes de arena, limo y arcilla sobre un triangulo textural.
+Como sabemos la textura representa una de las propiedades físicas más importantes de los suelos, en esta oportunidad vamos a emplear los paquetes de **plotrix** [@plotrix] y **soiltexture** [@soiltexture] para graficar valores en porcentajes de arena, limo y arcilla sobre un triángulo textural.
+
+::: callout-note
+## Paquetes Requeridos
+
+Para ejecutar los ejemplos de código en este documento, es necesario tener instalados los paquetes `plotrix` y `soiltexture`. Si aún no los tiene, puede instalarlos ejecutando el siguiente comando en su consola de R:
+
+```{{r, eval=FALSE}}
+# install.packages(c("plotrix", "soiltexture"))
+```
+:::
 
 ```{r packages}
 #| warning: false
@@ -19,25 +29,25 @@ library(soiltexture)
 
 ### Generación de datos de textura
 
-Para nuestro ejemplo vamos a generar valores aleatorios para los porcetajes de arena (sand), limo (silt) y arcilla (clay), empleando para números enteros la función `sample()` y para números decimales la función `runif()`.
+Para nuestro ejemplo vamos a generar valores aleatorios para los porcentajes de arena (sand), limo (silt) y arcilla (clay), empleando para números enteros la función `sample()` y para números decimales la función `runif()`.
 
 ::: callout-note
-En caso disponga de datos en una tabla en formarto \*.csv, se puede trabajar generando un dataframe con: `df_textura <- read.csv("file.csv")`.
+En caso disponga de datos en una tabla en formato \*.csv, se puede trabajar generando un dataframe con: `df_textura <- read.csv("file.csv")`.
 :::
 
 ```{r data}
 #| warning: false
-
+set.seed(123) # Establece la semilla para reproducibilidad de los números aleatorios
 # Generación de valores aleatorios sobre textura
-sand <- c(sample(0:60, 50, replace = T))
-silt <- c(sample(0:40, 50, replace = T))
-clay <- c(100-(sand+silt))
+sand <- c(sample(0:60, 50, replace = T)) # Genera 50 valores enteros aleatorios para arena entre 0 y 60, con reemplazo
+silt <- c(sample(0:40, 50, replace = T)) # Genera 50 valores enteros aleatorios para limo entre 0 y 40, con reemplazo
+clay <- c(100-(sand+silt)) # Calcula el porcentaje de arcilla asegurando que la suma de arena, limo y arcilla sea 100
 # Generación de números aleatorios referentes a valores de pH
-ph <-  c(runif(50, min=4,max=8)) 
+ph <-  c(runif(50, min=4,max=8)) # Genera 50 valores decimales aleatorios para pH entre 4 y 8
 
 
 # Generación de nuestra tabla de datos en formato dataframe.
-texture <- data.frame( "SAND" = sand, "SILT" = silt, "CLAY" = clay, "PH" = ph)
+texture <- data.frame( "SAND" = sand, "SILT" = silt, "CLAY" = clay, "PH" = ph) # Crea un dataframe con las columnas SAND, SILT, CLAY y PH
 ```
 
 ### Generando gráficos empleando Plotrix
@@ -52,16 +62,21 @@ El paquete dispone también de la función `get.soil.texture` para generar de ma
 ![](images/texture_soils.gif){fig-align="center"}
 :::
 
-Para generar nuestro gráfico tener en cuenta solo las columnas con los valores porcentuales de arena limo y arcilla.
+Para generar nuestro gráfico, es importante considerar solo las columnas con los valores porcentuales de arena, limo y arcilla.
 
 ::: panel-tabset
 ## Gráfico
 
 ```{r}
-soil.texture(texture[, 1:3], main="Triangulo Textural de Suelos", 
-             axis.labels = c("% Arena", "% Limo", "% Arcilla"),
-             show.lines=TRUE,show.names=TRUE, col.names= "black",
-             show.legend= FALSE, col.symbols="red", pch=16)
+soil.texture(texture[, 1:3], # Selecciona las primeras tres columnas del dataframe 'texture' (Arena, Limo, Arcilla)
+             main="Triangulo Textural de Suelos", # Título del gráfico
+             axis.labels = c("% Arena", "% Limo", "% Arcilla"), # Etiquetas para los ejes
+             show.lines=TRUE, # Muestra las líneas de las clases texturales
+             show.names=TRUE, # Muestra los nombres de las clases texturales
+             col.names= "black", # Color específico para los nombres de las clases texturales (cuando show.names=TRUE)
+             show.legend= FALSE, # Oculta la leyenda
+             col.symbols="red", # Color de los puntos en el gráfico
+             pch=16) # Tipo de símbolo para los puntos (círculo relleno)
 ```
 
 ## Tabla
@@ -82,7 +97,7 @@ Para cambiar la simbología de los puntos generados, podemos variar el argumento
 
 Con el paquete [soiltexture](https://cran.r-project.org/web/packages/soiltexture/index.html) disponemos de una caja de herramientas genérica para los datos de textura del suelo en R. Estas funciones pueden (1) trazar datos de textura del suelo (2) clasificar datos de textura del suelo, (3) transformar datos de textura del suelo desde y hacia diferentes sistemas de clases de tamaño de partículas, y (4) proporcionar algunas herramientas para 'explorar' los datos de textura del suelo (en el sentido de un análisis visual estadístico). Todas las herramientas están diseñadas para ser inherentemente clasificaciones de múltiples triángulos, múltiples geometrías y tamaños de partículas. También se proporciona una interfaz gráfica de usuario simple basada en texto: `soiltexture_gui()`.
 
-Entre los sistemas de clasificación de textura suelo existentes usaremos principalmente el [USDA](https://www.nrcs.usda.gov/Internet/FSE_DOCUMENTS/stelprdb1044818.pdf), pero podemos generar otros incluso superponer dos sistemas en un mismo gráfico.
+Entre los sistemas de clasificación de textura del suelo existentes usaremos principalmente el [USDA](https://www.nrcs.usda.gov/Internet/FSE_DOCUMENTS/stelprdb1044818.pdf), pero podemos generar otros incluso superponer dos sistemas en un mismo gráfico.
 
 ![](images/usda_class.png){fig-align="center" width="350"}
 
@@ -91,13 +106,14 @@ Entre los sistemas de clasificación de textura suelo existentes usaremos princi
 
 ```{r}
 TT.plot(
-  class.sys = "USDA.TT",  # Seleccionando el sistema de clasificación del USDA
-  lang = "es", # Personalizado al idioma español
-  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"),
-  class.p.bg.col = c("red", "purple", "brown", "wheat", "yellow", "pink", "beige", "orange", "green", "gray"),
-  tri.data = texture,
-  z.name = "PH",
-  main = "Triángulo Textural de Suelo - USDA"
+  class.sys = "USDA.TT",  # Establece el sistema de clasificación de textura del suelo a USDA
+  lang = "es", # Establece el idioma de las etiquetas del gráfico a español
+  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"), # Etiquetas personalizadas para los ejes de arcilla, limo y arena
+  # El sistema USDA tiene 12 clases, se proveen 12 colores.
+  class.p.bg.col = c("skyblue", "sandybrown", "lightgreen", "pink", "khaki", "lavender", "lightcoral", "palegoldenrod", "aquamarine", "thistle", "wheat", "lightgray"), # Colores de fondo para las clases de textura
+  tri.data = texture, # Especifica el dataframe 'texture' como fuente de datos
+  z.name = "PH", # Nombre de la variable adicional (pH) a representar en el gráfico (tamaño de los puntos)
+  main = "Triángulo Textural de Suelo - USDA" # Título principal del gráfico
 )
 ```
 
@@ -105,12 +121,13 @@ TT.plot(
 
 ```{r}
 TT.plot(
-  class.sys = "ISSS.TT",  
-  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"),
-  tri.data = texture,
-  class.p.bg.col = TRUE,
-  z.name = "PH",
-  main = "Triángulo Textural de Suelo - ISSS"
+  class.sys = "ISSS.TT",  # Establece el sistema de clasificación de textura del suelo a ISSS (Sociedad Internacional de la Ciencia del Suelo)
+  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"), # Etiquetas personalizadas para los ejes
+  tri.data = texture, # Especifica el dataframe 'texture' como fuente de datos
+  # El sistema ISSS tiene 4 clases principales, se proveen 4 colores.
+  class.p.bg.col = c("lightsalmon", "lightblue", "lightyellow", "lightpink"), # Colores de fondo para las clases de textura
+  z.name = "PH", # Nombre de la variable adicional (pH) a representar
+  main = "Triángulo Textural de Suelo - ISSS" # Título principal del gráfico
 )
 ```
 
@@ -118,12 +135,13 @@ TT.plot(
 
 ```{r}
 TT.plot(
-  class.sys = "HYPRES.TT",  
-  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"),
-  tri.data = texture,
-  class.p.bg.col = TRUE,
-  z.name = "PH",
-  main = "Triángulo Textural de Suelo - HYPRES"
+  class.sys = "HYPRES.TT",  # Establece el sistema de clasificación de textura del suelo a HYPRES (European Soil Map)
+  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"), # Etiquetas personalizadas para los ejes
+  tri.data = texture, # Especifica el dataframe 'texture' como fuente de datos
+  # El sistema HYPRES tiene 6 clases principales, se proveen 6 colores.
+  class.p.bg.col = c("palegreen", "skyblue", "plum", "sandybrown", "lightcyan", "mistyrose"), # Colores de fondo para las clases de textura
+  z.name = "PH", # Nombre de la variable adicional (pH) a representar
+  main = "Triángulo Textural de Suelo - HYPRES" # Título principal del gráfico
 )
 ```
 
@@ -132,108 +150,111 @@ TT.plot(
 ```{r}
 
 geom <- TT.plot(
-  class.sys = "USDA.TT",
-  main  = "Triángulos USDA y HYPRES superpuestos",
-  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"),
-  tri.data = texture
+  class.sys = "USDA.TT", # Establece el sistema de clasificación base a USDA
+  main  = "Triángulos USDA y HYPRES superpuestos", # Título del gráfico
+  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"), # Etiquetas de los ejes
+  tri.data = texture # Especifica el dataframe 'texture' como fuente de datos
 )
 TT.classes(
-  geo = geom,
-  class.sys = "HYPRES.TT",
-  class.line.col = "red",
-  class.lab.col = "blue",
-  lwd.axis = 3
+  geo = geom, # Objeto geométrico base del gráfico anterior (USDA)
+  class.sys = "HYPRES.TT", # Sistema de clasificación a superponer (HYPRES)
+  class.line.col = "red", # Color de las líneas del sistema HYPRES
+  class.lab.col = "blue", # Color de las etiquetas del sistema HYPRES
+  lwd.axis = 3 # Ancho de las líneas de los ejes del sistema HYPRES
 )
 ```
 :::
 
-Como apreciamos en el gráfico generado, se ha insertado los puntos ubicados en su respectiva clase textual que pertence (según el sistema elegido), además se incluye los valores de pH están representados en función al tamaño del diámetro del punto (valores bajos de pH presentan diámetros pequeños) y también se aprecia un gradiente de color para reforzar el efecto visual.
+Como apreciamos en el gráfico generado, se han insertado los puntos ubicados en su respectiva clase textural a la que pertenece (según el sistema elegido), además se incluye los valores de pH están representados en función del tamaño del diámetro del punto (valores bajos de pH presentan diámetros pequeños) y también se aprecia un gradiente de color para reforzar el efecto visual.
 
 ### Generación de un mapa de calor con valores de pH
 
-Siempre es importante evaluar un cuarto parámetro, pero si a eso le agregamos un mapa de calor generado a través de la interpolación de nuestro datos, en esta oportunidad emplea el método [IDW (Inverse Distance Weighting)](https://gisgeography.com/inverse-distance-weighting-idw-interpolation/). Para lograr ello, lo primero que hacemos es definir nuestros parámetros geométricos con `TT.geo.get()`, que nos permite determinar nuestra malla x-y en la que se calcula la distancia inversa.
+Siempre es importante evaluar un cuarto parámetro, pero si a eso le agregamos un mapa de calor generado a través de la interpolación de nuestros datos, en esta oportunidad se emplea el método [IDW (Inverse Distance Weighting)](https://gisgeography.com/inverse-distance-weighting-idw-interpolation/). Para lograr ello, lo primero que hacemos es definir nuestros parámetros geométricos con `TT.geo.get()`, que nos permite determinar nuestra malla x-y en la que se calcula la distancia inversa.
 
 ```{r plot3}
 
 # Definimos los parámetros geométricos de nuesto futuro gráfico
-geo <- TT.geo.get()
+geo <- TT.geo.get() # Obtiene la geometría base para los gráficos de textura, define los límites del triángulo
 
 # Calcular las distancias ponderadas inversas
-iwd.res <- TT.iwd(
-  geo = geo,
-  tri.data = texture,
-  z.name = "PH",
+iwd.res <- TT.iwd( # Calcula la interpolación por Distancia Inversa Ponderada (IDW)
+  geo = geo, # Geometría base del triángulo
+  tri.data = texture, # Dataframe con los datos de textura y la variable a interpolar
+  z.name = "PH", # Nombre de la columna en tri.data que contiene los valores a interpolar (pH)
 )
 # Generar la vista del mapa de calor usando el IWD
-TT.image(
-  x = iwd.res,
-  geo = geo,
-  main = "Mapa de calor sobre pH en relación a la textura"
+TT.image( # Crea un mapa de calor (imagen) a partir de los resultados de la interpolación IDW
+  x = iwd.res, # Resultados de la interpolación IDW
+  geo = geo, # Geometría base del triángulo
+  main = "Mapa de calor sobre pH en relación a la textura" # Título del gráfico
 )
 
 # Incorporar líneas en contorno
-TT.contour(
-  x = iwd.res,
-  geo = geo, 
-  add = TRUE, # Nos permite superponer las líneas sobre el mapa de calor
-  lwd = 2,
-  col = "#db139f93"
+TT.contour( # Agrega líneas de contorno al gráfico existente
+  x = iwd.res, # Resultados de la interpolación IDW (o cualquier malla de datos)
+  geo = geo, # Geometría base del triángulo
+  add = TRUE, # Indica que se añadirá al gráfico existente, en lugar de crear uno nuevo
+  lwd = 2, # Ancho de las líneas de contorno
+  col = "#db139f93" # Color de las líneas de contorno
 )
 # Incorporar nuestro triangulo textural USDA
-TT.plot(
-  geo = geo,
-  class.sys = "USDA.TT",
-  lang = "es",
-  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"),
-  grid.show = FALSE,
-  add = TRUE
+TT.plot( # Superpone el triángulo de clasificación textural USDA
+  geo = geo, # Geometría base del triángulo
+  class.sys = "USDA.TT", # Sistema de clasificación USDA
+  lang = "es", # Idioma español para las etiquetas
+  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"), # Etiquetas de los ejes
+  grid.show = FALSE, # Oculta la rejilla del triángulo de textura
+  add = TRUE # Añade al gráfico existente
 )
 
 ```
 
 ### Estimación de la densidad de probabilidad del Kernel 2D
 
-La estimación de la densidad de probabilidad del kernel en dos dimensiones (x-y), se "envuelve" en la función `TT.kde2d()` para que lo podamos emplear siguiendo la misma estructura anterior con nuestros datos de textura. La gráfica es representada a modo de líneas de contorno usando `TT.contour()`.
+La estimación de la densidad de probabilidad del kernel en dos dimensiones (x-y), se "envuelve" en la función `TT.kde2d()` para que lo podamos emplear siguiendo la misma estructura anterior con nuestros datos de textura. La gráfica se representa a modo de líneas de contorno usando `TT.contour()`.
 
 ```{r plot4}
 
-geo <- TT.geo.get()
+geo <- TT.geo.get() # Obtiene la geometría base para los gráficos de textura
 
-# Calcular las distancias ponderadas inversas
-kde.res <- TT.kde2d(
-  geo = geo,
-  tri.data = texture,
+# Calcular las densidades de Kernel 2D
+kde.res <- TT.kde2d( # Calcula la estimación de densidad de Kernel en dos dimensiones
+  geo = geo, # Geometría base del triángulo
+  tri.data = texture, # Dataframe con los datos de textura (columnas SAND, SILT, CLAY)
 )
 
 # Incorporar líneas en contorno
-TT.contour(
-  x = kde.res,
-  geo = geo,
-  main = "Densidad de Probabilidad estimada sobre datos de textura",
-  lwd = 2,
-  col = "red"
+TT.contour( # Dibuja las líneas de contorno basadas en la estimación de densidad de Kernel
+  x = kde.res, # Resultados del cálculo de densidad de Kernel
+  geo = geo, # Geometría base del triángulo
+  main = "Densidad de Probabilidad estimada sobre datos de textura", # Título del gráfico
+  lwd = 2, # Ancho de las líneas de contorno
+  col = "red" # Color de las líneas de contorno
 )
-# Incorporar nuestro triangulo textural USDA
-TT.plot(
-  geo = geo,
-  tri.data = texture,
-  class.sys = "USDA.TT",
-  lang = "es",
-  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"),
-  grid.show = FALSE,
-  add = TRUE,
-  col = "blue"
+# Incorporar nuestro triangulo textural USDA y los puntos originales
+TT.plot( # Superpone el triángulo de clasificación textural USDA y los puntos de datos
+  geo = geo, # Geometría base del triángulo
+  tri.data = texture, # Dataframe con los datos de textura para mostrar los puntos
+  class.sys = "USDA.TT", # Sistema de clasificación USDA
+  lang = "es", # Idioma español para las etiquetas
+  css.lab = c("Arcilla [%]", "Limo [%]", "Arena [%]"), # Etiquetas de los ejes
+  grid.show = FALSE, # Oculta la rejilla del triángulo de textura
+  add = TRUE, # Añade al gráfico existente
+  col = "blue" # Color de los puntos de datos
 )
 ```
 
 ### Generación de datos de clasificación de textura
 
-Si bien el objetivo era mostrar los gráficos que podemos generar en base a nuestros resultados de contenidos de arena, limo y arcilla, incluyendo también como vimos la posibilidad de integrar una cuarta variable. Ahora veremos como podemos visualizar una tabla con las clases texturales determinadas en función a un sistema de clasificación seleccionado. Para lograrlo usaremos la función `TT.points.in.classes()`. En resumen se muestra en cada fila nuestra muestra de suelo y las columnas representan las clases texturales, los valores **0** representa que esta fuera de esa clase y el valor de **1** que esta dentro, mientras que **2** cuando cae "en un lado del polígono" y **3** cuando cae en "las esquinas del polígono".
+Si bien el objetivo era mostrar los gráficos que podemos generar en base a nuestros resultados de contenidos de arena, limo y arcilla, incluyendo también como vimos la posibilidad de integrar una cuarta variable. Ahora veremos como podemos visualizar una tabla con las clases texturales determinadas en función a un sistema de clasificación seleccionado. Para lograrlo usaremos la función `TT.points.in.classes()`. En resumen se muestra en cada fila nuestra muestra de suelo y las columnas representan las clases texturales, los valores **0** representa que está fuera de esa clase y el valor de **1** que está dentro, mientras que **2** cuando el punto cae sobre el límite de un polígono y **3** cuando el punto cae en un vértice del polígono.
 
 ```{r tabla1}
 
 TT.points.in.classes(
-  tri.data = texture[1:10, ], # visualizar las 10 primeras filas
-  class.sys = "USDA.TT"
+  tri.data = texture[1:10, ], # Selecciona las primeras 10 filas del dataframe 'texture' para clasificar
+  class.sys = "USDA.TT" # Especifica el sistema de clasificación de textura del suelo a utilizar (USDA)
+  # La función devuelve una tabla donde las filas son las muestras y las columnas son las clases texturales.
+  # Un valor de 1 indica que la muestra pertenece a esa clase, 0 que no pertenece.
+  # Otros valores (2, 3) pueden indicar posiciones en los bordes o vértices de los polígonos de clase.
 )
 ```
