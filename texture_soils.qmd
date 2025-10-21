@@ -8,15 +8,15 @@ bibliography: references.bib
 
 ## Textura de los suelos
 
-Como sabemos la textura representa una de las propiedades físicas más importantes de los suelos, en esta oportunidad vamos a emplear los paquetes de **plotrix** [@plotrix] y **soiltexture** [@soiltexture] para graficar valores en porcentajes de arena, limo y arcilla sobre un triángulo textural.
+Como sabemos la textura representa una de las propiedades físicas más importantes de los suelos, en esta oportunidad vamos a emplear los paquetes de **plotrix** [@plotrix], **soiltexture** [@soiltexture] y **ggtern** para graficar valores en porcentajes de arena, limo y arcilla sobre un triángulo textural. Estos paquetes ofrecen diferentes enfoques: plotrix proporciona funciones simples y directas, soiltexture está especializado en ciencia del suelo con múltiples sistemas de clasificación, y ggtern aprovecha la potencia y flexibilidad de ggplot2 para crear visualizaciones modernas y altamente personalizables.
 
 ::: callout-note
 ## Paquetes Requeridos
 
-Para ejecutar los ejemplos de código en este documento, es necesario tener instalados los paquetes `plotrix` y `soiltexture`. Si aún no los tiene, puede instalarlos ejecutando el siguiente comando en su consola de R:
+Para ejecutar los ejemplos de código en este documento, es necesario tener instalados los paquetes `plotrix`, `soiltexture` y `ggtern`. Si aún no los tiene, puede instalarlos ejecutando el siguiente comando en su consola de R:
 
 ```{{r, eval=FALSE}}
-# install.packages(c("plotrix", "soiltexture"))
+# install.packages(c("plotrix", "soiltexture", "ggtern"))
 ```
 :::
 
@@ -25,6 +25,7 @@ Para ejecutar los ejemplos de código en este documento, es necesario tener inst
 
 library(plotrix)
 library(soiltexture)
+library(ggtern)
 ```
 
 ### Generación de datos de textura
@@ -243,6 +244,158 @@ TT.plot( # Superpone el triángulo de clasificación textural USDA y los puntos 
   col = "blue" # Color de los puntos de datos
 )
 ```
+
+### Generando gráficos empleando ggtern
+
+El paquete [ggtern](https://cran.r-project.org/web/packages/ggtern/index.html) es una extensión de ggplot2 que permite crear diagramas ternarios con la misma sintaxis y filosofía de la "gramática de gráficos". Este paquete ofrece gran flexibilidad para personalizar los gráficos y se integra perfectamente con el ecosistema tidyverse, permitiendo aprovechar todas las capacidades de ggplot2 como temas, escalas de colores, facetas y anotaciones.
+
+::: callout-note
+**ggtern** utiliza la misma estructura que ggplot2, por lo que si ya estás familiarizado con ggplot2, será muy fácil crear gráficos ternarios. La principal diferencia es que usamos tres ejes (x, y, z) en lugar de dos.
+:::
+
+::: panel-tabset
+## Gráfico básico
+
+```{r}
+ggtern(data = texture, aes(x = SAND, y = SILT, z = CLAY)) +
+  geom_point(size = 3, color = "red", alpha = 0.6) +
+  labs(
+    title = "Triángulo Textural de Suelos - ggtern",
+    x = "Arena (%)",
+    y = "Limo (%)",
+    z = "Arcilla (%)"
+  ) +
+  theme_bw() +
+  theme_showarrows() # Muestra las flechas en los ejes
+```
+
+## Gráfico con gradiente de pH
+
+```{r}
+ggtern(data = texture, aes(x = SAND, y = SILT, z = CLAY)) +
+  geom_point(aes(color = PH, size = PH), alpha = 0.7) +
+  scale_color_gradient(
+    low = "blue",
+    high = "red",
+    name = "pH"
+  ) +
+  scale_size_continuous(range = c(2, 6), name = "pH") +
+  labs(
+    title = "Triángulo Textural con Gradiente de pH",
+    x = "Arena (%)",
+    y = "Limo (%)",
+    z = "Arcilla (%)"
+  ) +
+  theme_bw() +
+  theme_showarrows()
+```
+
+## Gráfico con densidad 2D
+
+```{r}
+ggtern(data = texture, aes(x = SAND, y = SILT, z = CLAY)) +
+  geom_density_tern(aes(fill = ..level.., alpha = ..level..)) +
+  geom_point(size = 2, color = "black") +
+  scale_fill_gradient(low = "yellow", high = "red") +
+  labs(
+    title = "Triángulo Textural con Densidad 2D",
+    x = "Arena (%)",
+    y = "Limo (%)",
+    z = "Arcilla (%)"
+  ) +
+  theme_bw() +
+  theme_showarrows() +
+  guides(alpha = "none") # Oculta la leyenda de alpha
+```
+
+## Gráfico con contornos
+
+```{r}
+ggtern(data = texture, aes(x = SAND, y = SILT, z = CLAY)) +
+  stat_density_tern(
+    geom = 'polygon',
+    aes(fill = ..level.., alpha = ..level..)
+  ) +
+  geom_point(size = 2.5, color = "white", shape = 21, fill = "black", stroke = 0.5) +
+  scale_fill_gradient(low = "lightblue", high = "darkblue", name = "Densidad") +
+  labs(
+    title = "Triángulo Textural con Contornos de Densidad",
+    x = "Arena (%)",
+    y = "Limo (%)",
+    z = "Arcilla (%)"
+  ) +
+  theme_classic() +
+  theme_showarrows() +
+  guides(alpha = "none")
+```
+
+## Gráfico con múltiples temas
+
+```{r}
+ggtern(data = texture, aes(x = SAND, y = SILT, z = CLAY)) +
+  geom_point(aes(color = PH), size = 4, alpha = 0.8) +
+  scale_color_viridis_c(option = "plasma", name = "pH") +
+  labs(
+    title = "Triángulo Textural - Tema Personalizado",
+    x = "Arena (%)",
+    y = "Limo (%)",
+    z = "Arcilla (%)"
+  ) +
+  theme_rgbw() + # Tema con colores RGB en las esquinas
+  theme_showarrows()
+```
+
+## Gráfico con elipses de confianza
+
+```{r}
+ggtern(data = texture, aes(x = SAND, y = SILT, z = CLAY)) +
+  geom_point(size = 2, alpha = 0.5, color = "steelblue") +
+  stat_confidence_tern(
+    geom = 'polygon',
+    breaks = c(0.5, 0.75, 0.95),
+    aes(fill = ..level..),
+    alpha = 0.3
+  ) +
+  scale_fill_gradient(
+    low = "lightgreen",
+    high = "darkgreen",
+    name = "Nivel de\nConfianza"
+  ) +
+  geom_point(
+    stat = 'mean_tern',
+    size = 5,
+    color = 'red',
+    shape = 3,
+    stroke = 2
+  ) +
+  labs(
+    title = "Triángulo Textural con Elipses de Confianza",
+    subtitle = "El punto rojo indica la media",
+    x = "Arena (%)",
+    y = "Limo (%)",
+    z = "Arcilla (%)"
+  ) +
+  theme_bw() +
+  theme_showarrows()
+```
+:::
+
+::: callout-tip
+## Ventajas de ggtern
+
+- **Sintaxis familiar**: Si conoces ggplot2, ggtern es muy fácil de usar
+- **Altamente personalizable**: Acceso completo a temas, escalas y geometrías de ggplot2
+- **Estadísticas integradas**: Densidades, contornos, elipses de confianza, etc.
+- **Exportación**: Compatible con ggsave() para guardar gráficos en alta calidad
+- **Interactividad**: Se puede combinar con plotly para gráficos interactivos
+
+**Ejemplo de guardado:**
+```{{r, eval=FALSE}}
+p <- ggtern(data = texture, aes(x = SAND, y = SILT, z = CLAY)) +
+  geom_point(aes(color = PH), size = 3)
+ggsave("mi_triangulo_textural.png", p, width = 8, height = 6, dpi = 300)
+```
+:::
 
 ### Generación de datos de clasificación de textura
 
